@@ -1,7 +1,8 @@
 import { configDotenv } from 'dotenv';
 import express from 'express';
 import { Request } from "express";
-import { resourceUsage } from 'node:process';
+import { query, validationResult, body, matchedData, checkSchema } from 'express-validator';
+import {createNameValidationSchema, queryValidationSchema} from './utils/validationSchema'
 
 interface CustomRequest extends Request {
   findIndex: number;
@@ -60,31 +61,55 @@ app.get('/MW',
     }
 )
 
-app.get('/bts', (req, res) => {
-    console.log(req.query);
-    const {
-        query:{filter, value}
-    } = req;
-    // //when filter and value are not provided, return the whole name array
-    // if (!filter && !value) return res.send(name);
-    if (filter && value) 
-        return res.send(
-            // check if filter contains the value
-            name.filter((members) => String(members[filter as string]).includes(String(value)))
-        );
-    return res.send(name);
-});
+//query('x').y = validation chain to validate if y in x is true
+app.get(
+    '/bts', 
+    checkSchema(queryValidationSchema), 
+    (req, res) => {
+    //console.log(req["express-validator#contexts"]);
+        const result = validationResult(req);
+
+        if (!result.isEmpty())
+            return res.status(400).send({error: result.array()});
+
+        const data=matchedData(req);
+        console.log(data)
+        const {
+            query:{filter, value}
+        } = req;
+        // //when filter and value are not provided, return the whole name array
+        // if (!filter && !value) return res.send(name);
+        if (filter && value) 
+            return res.send(
+                // check if filter contains the value
+                name.filter((members) => String(members[filter as string]).includes(String(value)))
+            );
+        return res.send(name);
+    }
+);
 
 // POST REQUEST
 // You can use the same URL as GET req, bc server can differentiate them by the method used in the request
-app.post('/bts', (req, res) => {
-    console.log(req.body);
-    const {body} = req; // destructuring the body from the request
-    // ...body = spread operator to copy all properties from body to the new object
-    const newUsers = {id: (name.at(-1)?.id ?? 0) + 1, ...body}; // get the last id and add 1 to it
-    name.push(newUsers); // add the new user to the name array
-    return res.status(201).send(newUsers); //201 = created
-});
+app.post(
+    '/bts', 
+    checkSchema(createNameValidationSchema), 
+    (req, res) => {
+        const result = validationResult(req)
+        console.log(result)
+
+        if(!result.isEmpty()) // if there's any error
+            return res.status(400).send({error: result.array()})
+
+        const data = matchedData(req) as {
+            name: string;
+            realname: string;
+        };
+        // ...body = spread operator to copy all properties from body to the new object
+        const newUsers = {id: (name.at(-1)?.id ?? 0) + 1, ...data}; // get the last id and add 1 to it
+        name.push(newUsers); // add the new user to the name array
+        return res.status(201).send(newUsers); //201 = created
+    }
+);
 
 // route parameters
 // :id = dynamic value that can be accessed through req.params.id
