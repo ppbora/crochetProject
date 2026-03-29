@@ -1,11 +1,11 @@
 import {Router, type Request, type Response} from "express";
 import { loginSchema } from "../../utils/validation-schemas.ts";
 import { checkSchema, validationResult } from "express-validator";
-import {login} from "../../utils/login-auth.ts"
+import {login} from "../../utils/auth-function.ts"
 
 const router=Router();
 
-router.post("/api/login", checkSchema(loginSchema),async(req:Request,res:Response)=>{
+router.post("/api/auth/login", checkSchema(loginSchema), login, async(req:Request,res:Response)=>{
     const errors = validationResult(req);
     
     if(!errors.isEmpty())

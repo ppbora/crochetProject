@@ -1,7 +1,8 @@
+import "reflect-metadata";
 import express from "express";
 import connectToDatabase from "./db/connection-Mongo.ts";
-import cookieParser from "cookie-parser";
-import env from "./config/config-env.ts"
+import authRoutes from "./routes/authRoutes.ts"
+import env from "./config/config-env.ts";
 
 const app = express();
 
@@ -9,11 +10,13 @@ const app = express();
 connectToDatabase();
 
 app.use(express.json());
-app.use(cookieParser("secret"));
-
 
 app.get("/", (req, res) => {
-  res.send("API is working ....");
+  res.send("API is working...");
 });
 
-//app.use("/api", authRoutes);
+app.use(authRoutes);
+
+app.listen(env.PORT, ()=> {
+            console.log(`Server is running on ${env.PORT}`)
+        })

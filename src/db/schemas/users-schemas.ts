@@ -1,13 +1,14 @@
+
 import {prop, getModelForClass} from "@typegoose/typegoose";
 
 class Users{
-    @prop()
+    @prop({type: () => String})
     public name?:string; //both valus or undefined
-    @prop({required:true})
+    @prop({required:true, unique: true,type: () => String})
     public username!: string //need to have a value
-    @prop({required:true})
+    @prop({required:true,type: () => String})
     public password!: string
-    @prop()
+    @prop({type: () => String})
     public refreshToken?: string;
 }
 
