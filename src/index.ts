@@ -10,3 +10,10 @@ connectToDatabase();
 
 app.use(express.json());
 app.use(cookieParser("secret"));
+
+
+app.get("/", (req, res) => {
+  res.send("API is working ....");
+});
+
+//app.use("/api", authRoutes);
