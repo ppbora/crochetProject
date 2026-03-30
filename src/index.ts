@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express from "express";
 import connectToDatabase from "./db/connection-Mongo.ts";
-import authRoutes from "./routes/authRoutes.ts"
+import authRoutes from "./routes/auth-routes.ts"
 import env from "./config/config-env.ts";
 
 const app = express();

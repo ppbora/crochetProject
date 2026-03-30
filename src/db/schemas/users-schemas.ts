@@ -9,6 +9,8 @@ class Users{
     @prop({required:true,type: () => String})
     public password!: string
     @prop({type: () => String})
+    public gender?: string
+    @prop({type: () => String})
     public refreshToken?: string;
 }
 
