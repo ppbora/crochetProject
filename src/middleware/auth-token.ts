@@ -7,8 +7,10 @@ export const authenticateToken = (req:AuthRequest, res:Response, next:NextFuncti
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];  // Bearer <token>
 
-    if (token == null) return res.sendStatus(401);  // No token present
-
+    if (!token) {
+            return res.status(401).send({ error: "Access Denied. No token provided." });
+    }
+    
     jwt.verify(token, env.ACCESS_SECRET_KEY, (err, user) => {
         if (err) return res.sendStatus(403);  // Invalid token
 

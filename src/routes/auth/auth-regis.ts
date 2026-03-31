@@ -12,9 +12,9 @@ router.post("/api/auth/register",hashPasswordMW, async(req,res)=>{
         if(!findUser) {
             const newUser = new UserModel({name, username,password,gender});
             const saveUser = await newUser.save();
-            return res.status(200).send(`User: ${saveUser.username}`);
+            return res.status(200).send({message: "Username is available" , user: saveUser.username});
         } else {
-            return res.status(400).send({error: "Username is already existed."});
+            return res.status(400).send({error: "Username is not available"});
         }
     } catch(err){
         res.status(400).send({error: "Error while saving user"});

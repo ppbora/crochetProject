@@ -1,7 +1,7 @@
 import {Router, type Request, type Response} from "express";
 import { loginSchema } from "../../utils/validation-schemas.ts";
 import { checkSchema, validationResult } from "express-validator";
-import {login} from "../../utils/auth-function.ts"
+import {login} from "../../utils/login-function.ts"
 
 const router=Router();
 

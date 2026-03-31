@@ -19,10 +19,16 @@ export const login = async (req: Request, res: Response ) =>{
         const refreshToken = jwt.sign({ username }, REFRESH_SECRET_KEY, { expiresIn: '30d' });
         findUser.refreshToken = refreshToken;
         await findUser.save();
+
+        res.cookie('refreshToken', refreshToken,{
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 30 * 24 * 60 * 60 * 1000 //30 days
+        })
+
         return res.status(200).send({ 
             message: "Login successful!",
-            accessToken: accessToken,
-            refreshToken: refreshToken
+            accessToken: accessToken
         });
     } else{
             return res.status(401).json({ error: "Invalid username or password" });
