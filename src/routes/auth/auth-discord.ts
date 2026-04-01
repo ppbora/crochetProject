@@ -11,9 +11,9 @@ const router = Router();
 router.get('/api/auth/discord', passport.authenticate("discord"));
 router.get('/api/auth/discord/redirect', passport.authenticate("discord"), (req, res)=>{
     try{
-        const {username} = req.body
+        const username = req.user
         const accessToken = jwt.sign({ username: username }, ACCESS_SECRET_KEY, { expiresIn: '30m' });
-        const refreshToken = jwt.sign({ uername: username }, REFRESH_SECRET_KEY, { expiresIn: '30d' });
+        const refreshToken = jwt.sign({ uหername: username }, REFRESH_SECRET_KEY, { expiresIn: '30d' });
         if (refreshToken) {
             res.cookie('refreshToken', refreshToken,{
                 httpOnly: true, 
@@ -26,6 +26,7 @@ router.get('/api/auth/discord/redirect', passport.authenticate("discord"), (req,
                 accessToken: accessToken
         });
     } catch(err){
+        console.error("Login Server Error: ", err);
         res.status(500).json({ error: "Server error" });
     }
 });

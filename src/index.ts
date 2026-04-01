@@ -4,7 +4,9 @@ import connectToDatabase from "./db/connection-Mongo.ts";
 import authRoutes from "./routes/auth-routes.ts"
 import env from "./config/config-env.ts";
 import cookieParser from "cookie-parser";
-import session from "express-session"
+import session from "express-session";
+import passport from "passport";
+import {serializeUser, deserializeUser} from "./strategies/serialization.ts"
 
 const app = express();
 
@@ -22,6 +24,12 @@ app.use(session({
         maxAge: 1000 * 60 * 30 
     }
 }));
+
+app.use(passport.initialize()) //Adds Passport functionality to req
+app.use(passport.session()) //connects Passport to sessions
+
+passport.serializeUser(serializeUser);
+passport.deserializeUser(deserializeUser);
 
 app.get("/", (req, res) => {
   res.send("API is working...");
