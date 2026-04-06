@@ -19,6 +19,9 @@ class Users{
     public discordId?: string;
     @prop({type: () => String})
     public googleId?: string;
+
+    @prop({required:true, type: () => String})
+    public login!: string;
 }
 
 const UserModel = getModelForClass(Users);
