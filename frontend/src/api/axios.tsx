@@ -4,16 +4,21 @@ import { jwtDecode } from "jwt-decode";
 const api = axios.create({
   withCredentials: true,
 });
+
 let currentAccessToken = "";
+let onTokenRefreshed: ((token: string) => void) | null = null;
+
 export const setAccessToken = (token: string) => {
   currentAccessToken = token;
 };
 
+export const onTokenChange = (cb: (token: string) => void) => {
+  onTokenRefreshed = cb;
+};
+
 api.interceptors.request.use(
   async (config) => {
-    if (!currentAccessToken) {
-      return config;
-    }
+    if (!currentAccessToken) return config;
 
     const decoded = jwtDecode(currentAccessToken);
     const currentTime = Date.now() / 1000;
@@ -24,7 +29,6 @@ api.interceptors.request.use(
       return config;
     }
 
-    //Token expired
     try {
       const response = await axios.post(
         "/api/auth/refresh",
@@ -32,7 +36,7 @@ api.interceptors.request.use(
         { withCredentials: true },
       );
       currentAccessToken = response.data.accessToken;
-
+      onTokenRefreshed?.(currentAccessToken);
       config.headers["Authorization"] = `Bearer ${currentAccessToken}`;
       return config;
     } catch (error) {

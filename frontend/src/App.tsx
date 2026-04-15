@@ -1,47 +1,51 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import axios from "axios";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import { useState, useEffect } from "react";
+import api, { setAccessToken, onTokenChange } from "./api/axios";
+import axios from "axios";
 
 function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(true);
 
-  //auto-login check
+  useEffect(() => {
+    onTokenChange((newToken) => {
+      setToken(newToken);
+    });
+  }, []);
+
   useEffect(() => {
     const silentRefresh = async () => {
-      try {
-        //accces token
-        const res = await axios.post("/api/auth/refresh");
-        setToken(res.data.accessToken);
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      if (!isLoggedIn) {
+        setLoading(false);
+        return;
+      }
 
-        //get user
-        const userRes = await axios.get("/api/users/me", {
-          headers: { Authorization: `Bearer ${res.data.accessToken}` },
-        });
+      try {
+        const res = await axios.post(
+          "http://localhost:8080/api/auth/refresh",
+          {},
+          { withCredentials: true },
+        );
+        const newToken = res.data.accessToken;
+
+        setAccessToken(newToken);
+        setToken(newToken);
+
+        const userRes = await api.get("http://localhost:8080/api/users/me");
         setUser(userRes.data.user);
-        if (!token) {
-          //accces token
-          const res = await axios.post("/api/auth/refresh");
-          setToken(res.data.accessToken);
-          //get user
-          const userRes = await axios.get("/api/users/me", {
-            headers: { Authorization: `Bearer ${res.data.accessToken}` },
-          });
-          setUser(userRes.data.user);
-        }
       } catch (err) {
-        setToken("");
-        setUser(null);
-        console.log("User is not logged in. Browsing as guest.");
+        localStorage.removeItem("isLoggedIn");
       } finally {
         setLoading(false);
       }
     };
+
     silentRefresh();
   }, []);
 
