@@ -1,1 +1,6 @@
 @import "tailwindcss";
+@source "../src";
+
+button {
+  border-radius: inherit;
+}
