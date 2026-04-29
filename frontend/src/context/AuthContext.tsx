@@ -38,7 +38,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const silentRefresh = async () => {
-      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      const isLoggedIn =
+        localStorage.getItem("isLoggedIn") ||
+        sessionStorage.getItem("isLoggedIn");
       if (!isLoggedIn) {
         setLoading(false);
         return;
@@ -54,7 +56,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAccessToken(newToken);
         setToken(newToken);
 
-        const userRes = await api.get("http://localhost:8080/api/users/me");
+        const userRes = await api.get("http://localhost:8080/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${newToken}`,
+          },
+        });
         setUser(userRes.data.user);
       } catch (err) {
         localStorage.removeItem("isLoggedIn");
@@ -78,6 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken("");
       setUser(null);
       localStorage.removeItem("isLoggedIn");
+      sessionStorage.removeItem("isLoggedIn");
     }
   };
 

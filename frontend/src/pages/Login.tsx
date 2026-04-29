@@ -48,7 +48,7 @@ const Login = () => {
       if (remember) {
         localStorage.setItem("isLoggedIn", "true");
       } else {
-        localStorage.removeItem("isLoggedIn");
+        sessionStorage.setItem("isLoggedIn", "true");
       }
 
       navigate("/");
